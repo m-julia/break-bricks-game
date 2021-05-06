@@ -101,17 +101,40 @@ function moveBall() {
         ball.dx *= -1
     }
 
-    if(ball.y - ball.size < 0) {
+    if(ball.y - ball.size < 0 || ball.y + ball.size > canvas.height) {
         ball.dy *= -1
     }
 
     if(
         ball.x - ball.size > paddle.x &&
         ball.x + ball.size < paddle.x + paddle.w &&
-        ball.y + ball.size > paddle.y
+        ball.y + ball.size > paddle.y - paddle.h
     )  {
         ball.dy = -ball.speed
     }
+    bricks.forEach(column => {
+        column.forEach(brick => {
+            if(brick.visible) {
+                if(
+                    ball.x - ball.size > brick.x &&
+                    ball.x + ball.size < brick.x + brick.w &&
+                    ball.y + ball.size > brick.y &&
+                    ball.y - ball.size < brick.y + brick.h
+                ) {
+                    console.log('hhhh')
+                    ball.dy *= -1;
+                    brick.visible = false;
+                    increaseScore();    
+                }
+            }
+        });
+    });
+
+    if (ball.y + ball.size > canvas.height) {
+        showAllBricks();
+        score = 0;
+    }
+    
 }
 
 function drow() {
@@ -130,6 +153,27 @@ function update() {
 }
 
 update();
+
+
+function showAllBricks() {
+    bricks.forEach(column => {
+        column.forEach(brick => {
+            brick.visible = true;
+        })
+    })
+}
+
+function increaseScore() {
+    score++;
+    if(score % (brickRowCount * brickColumnCount) === 0) {
+        showAllBricks();
+        score = 0;
+    }
+}
+
+
+
+
 
 function keyDown(e) {
     if(e.key === 'Right' || e.key === 'ArrowRight') {
